@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hotel Finder</title>
+  <link rel="stylesheet" href="hotels.css" />
+</head>
+<body>
+  <header>
+    <h1>Hotel Booking</h1>
+    <p>Search hotels by city</p>
+  </header>
+
+  <main>
+    <div class="search-box">
+      <input type="text" id="cityInput" placeholder="Enter a city (e.g., Delhi)" />
+      <button onclick="searchHotels()">Search</button>
+    </div>
+    <div id="hotelsContainer" class="hotels"></div>
+  </main>
+
+  <!-- Booking Modal -->
+  <div class="modal" id="bookingModal" role="dialog" aria-labelledby="modalTitle" aria-modal="true" style="display:none;">
+    <div class="modal-content">
+      <button class="close" aria-label="Close modal" onclick="closeModal()">&times;</button>
+      <h2 id="modalTitle">Book Your Stay</h2>
+      <form id="bookingForm" onsubmit="submitBooking(event)" autocomplete="off">
+        <input type="text" id="guestName" name="guestName" placeholder="Your Name" required />
+        <input type="email" id="guestEmail" name="guestEmail" placeholder="Your Email" required />
+        <input type="date" id="checkIn" name="checkIn" required />
+        <input type="date" id="checkOut" name="checkOut" required />
+        <input type="number" id="guests" name="guests" placeholder="Number of Guests" min="1" required />
+        <button type="submit">Confirm Booking</button>
+      </form>
+      <p id="confirmationMessage" style="display:none;">Booking confirmed! We'll contact you soon.</p>
+    </div>
+  </div>
+ 
+  <footer>
+    <a href="index.html" class="back-btn">← Back to Home</a>
+  </footer>
+
+  <script src="hotels.js"></script>
+</body>
+</html>

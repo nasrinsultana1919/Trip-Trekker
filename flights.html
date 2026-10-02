@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Flight Search India</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f0f4f8;
+    margin: 0;
+    padding: 30px;
+    color: #333;
+  }
+
+  h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 28px;
+    color: #222;
+  }
+
+  form {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    background: #fff;
+    padding: 20px 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    margin-bottom: 30px;
+  }
+
+  select, input[type="date"], button {
+    padding: 10px 14px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    min-width: 180px;
+    box-shadow: 1px 1px 4px rgba(0,0,0,0.05);
+  }
+
+  button {
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  button:hover {
+    background-color: #0056b3;
+  }
+
+  #results {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .flight-result {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease;
+  }
+
+  .flight-result:hover {
+    transform: translateY(-4px);
+  }
+
+  .flight-result strong {
+    font-size: 18px;
+    display: block;
+    margin-bottom: 10px;
+    color: #007BFF;
+  }
+
+  .flight-result a {
+    color: #007BFF;
+    text-decoration: none;
+    margin-right: 12px;
+  }
+
+  .flight-result a:hover {
+    text-decoration: underline;
+  }
+</style>
+</head>
+<body>
+
+  <h2>Search Flights in India</h2>
+  <form id="flight-form">
+    <label>From:
+      <select id="origin" required></select>
+    </label>
+    <label>To:
+      <select id="destination" required></select>
+    </label>
+    <label>Date:
+      <input type="date" id="departure-date" value="2025-05-25" required />
+    </label>
+    <button type="submit">Search</button>
+  </form>
+
+  <div id="results"></div>
+
+  <script>
+    const airportList = [
+  { code: 'DEL', city: 'Delhi' },
+  { code: 'BOM', city: 'Mumbai' },
+  { code: 'BLR', city: 'Bengaluru' },
+  { code: 'CCU', city: 'Kolkata' },
+  { code: 'HYD', city: 'Hyderabad' },
+  { code: 'MAA', city: 'Chennai' },
+  { code: 'COK', city: 'Kochi' },
+  { code: 'AMD', city: 'Ahmedabad' },
+  { code: 'GOI', city: 'Goa' },
+  { code: 'JAI', city: 'Jaipur' },
+  { code: 'PNQ', city: 'Pune' },
+  { code: 'GAU', city: 'Guwahati' },
+  { code: 'BBI', city: 'Bhubaneswar' },
+  { code: 'NAG', city: 'Nagpur' },
+  { code: 'TRV', city: 'Thiruvananthapuram' },
+  { code: 'CCJ', city: 'Kozhikode' },
+  { code: 'VTZ', city: 'Visakhapatnam' },
+  { code: 'IXC', city: 'Chandigarh' },
+  { code: 'LKO', city: 'Lucknow' },
+  { code: 'PAT', city: 'Patna' },
+  { code: 'RPR', city: 'Raipur' },
+  { code: 'IXR', city: 'Ranchi' },
+  { code: 'IXB', city: 'Bagdogra' },
+  { code: 'IXM', city: 'Madurai' },
+  { code: 'IXE', city: 'Mangalore' },
+  { code: 'DIB', city: 'Dibrugarh' },
+  { code: 'IMF', city: 'Imphal' },
+  { code: 'SXR', city: 'Srinagar' },
+  { code: 'IXJ', city: 'Jammu' },
+  { code: 'UDR', city: 'Udaipur' },
+  { code: 'TIR', city: 'Tirupati' },
+  { code: 'RAJ', city: 'Rajkot' },
+  { code: 'JLR', city: 'Jabalpur' },
+  { code: 'BDQ', city: 'Vadodara' },
+  { code: 'IXD', city: 'Prayagraj' },
+  { code: 'VNS', city: 'Varanasi' },
+  { code: 'GWL', city: 'Gwalior' }
+];
+
+    const client_id = 'h8HXjdD2GqumP9dhd81ckz4hiGgAHy2I';
+    const client_secret = 'wjfysf5O2N0rmppG';
+
+    // Populate dropdowns
+    function populateAirports() {
+      const originSelect = document.getElementById('origin');
+      const destSelect = document.getElementById('destination');
+      airportList.forEach(airport => {
+        const opt1 = new Option(`${airport.city} (${airport.code})`, airport.code);
+        const opt2 = new Option(`${airport.city} (${airport.code})`, airport.code);
+        originSelect.add(opt1.cloneNode(true));
+        destSelect.add(opt2.cloneNode(true));
+      });
+      originSelect.value = 'DEL';
+      destSelect.value = 'BOM';
+    }
+
+    async function getAccessToken() {
+      const url = 'https://test.api.amadeus.com/v1/security/oauth2/token';
+      const data = new URLSearchParams({
+        grant_type: 'client_credentials',
+        client_id,
+        client_secret
+      });
+
+      try {
+        const response = await axios.post(url, data.toString(), {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        });
+        return response.data.access_token;
+      } catch (err) {
+        console.error('Token Error:', err.response?.data || err.message);
+        alert('Failed to get access token.');
+        throw err;
+      }
+    }
+
+    async function searchFlights(token, origin, destination, date) {
+      const url = 'https://test.api.amadeus.com/v2/shopping/flight-offers';
+      const params = {
+        originLocationCode: origin,
+        destinationLocationCode: destination,
+        departureDate: date,
+        adults: 1,
+        max: 6
+      };
+
+      try {
+        const response = await axios.get(url, {
+          headers: { Authorization: `Bearer ${token} `},
+          params
+        });
+        displayFlights(response.data.data, origin, destination, date);
+      } catch (err) {
+        console.error('Flight Error:', err.response?.data || err.message);
+        alert('No flights found or API error.');
+      }
+    }
+
+    function displayFlights(flights, origin, destination, date) {
+      const results = document.getElementById('results');
+      results.innerHTML = '';
+
+      if (!flights.length) {
+        results.innerHTML = '<p>No flights found.</p>';
+        return;
+      }
+
+      flights.forEach((flight, index) => {
+        const offer = flight.itineraries[0].segments[0];
+        const airline = offer.carrierCode;
+        const depTime = offer.departure.at;
+        const arrTime = offer.arrival.at;
+        const price = flight.price.total;
+
+        const linkMTM = `https://www.makemytrip.com/flight/search?itinerary=${origin}-${destination}-${date}&paxType=A-1_C-0_I-0&cabinClass=E`;
+        const linkYatra = `https://www.yatra.com/flight-schedule/${origin}-${destination}-flights.html`;
+        const linkCleartrip = `https://www.cleartrip.com/flights/results?from=${origin}&to=${destination}&depart_date=${date}`;
+
+        const div = document.createElement('div');
+        div.className = 'flight-result';
+        div.innerHTML = `
+          <strong>Flight ${index + 1}</strong><br>
+          Airline Code: ${airline}<br>
+          From: ${origin} (${depTime})<br>
+          To: ${destination} (${arrTime})<br>
+          Price: ₹${price}<br>
+          <a href="${linkMTM}" target="_blank">Book on MakeMyTrip</a> |
+          <a href="${linkYatra}" target="_blank">Book on Yatra</a> |
+          <a href="${linkCleartrip}" target="_blank">Book on Cleartrip</a>
+        `;
+        results.appendChild(div);
+      });
+    }
+
+    document.getElementById('flight-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const origin = document.getElementById('origin').value;
+      const destination = document.getElementById('destination').value;
+      const date = document.getElementById('departure-date').value;
+
+      const token = await getAccessToken();
+      await searchFlights(token, origin, destination, date);
+    });
+
+    populateAirports();
+  </script>
+  
+
+</body>
+</html>

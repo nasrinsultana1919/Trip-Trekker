@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Travel Map with Interests</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+ <style>
+
+  * { box-sizing: border-box; }
+
+
+
+  body, html {
+
+    margin: 0;
+
+    padding: 0;
+
+    font-family: 'Segoe UI', sans-serif;
+
+    height: 100%;
+
+    background: linear-gradient(135deg, #a18cd1, #fbc2eb, #8ec5fc);
+
+    background-size: 400% 400%;
+
+    animation: dreamyBG 15s ease infinite;
+
+    color: #333;
+
+  }
+
+
+
+  @keyframes dreamyBG {
+
+    0% { background-position: 0% 50%; }
+
+    50% { background-position: 100% 50%; }
+
+    100% { background-position: 0% 50%; }
+
+  }
+
+
+
+  h2 {
+
+    text-align: center;
+
+    padding: 20px 10px 5px;
+
+    font-size: 30px;
+
+    color: #ffffff;
+
+    text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+
+  }
+
+
+
+  .interest-section {
+
+    padding: 15px 10px 30px;
+
+    background: rgba(255, 255, 255, 0.15);
+
+    backdrop-filter: blur(8px);
+
+    border-radius: 16px;
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    justify-content: center;
+
+    gap: 16px;
+
+    margin: 0 20px;
+
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+
+  }
+
+
+
+  .interest-card {
+
+    width: 100px;
+
+    height: 100px;
+
+    padding: 12px;
+
+    background: linear-gradient(145deg, #d0bfff, #ffcbf2);
+
+    border-radius: 14px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    cursor: pointer;
+
+    transition: all 0.3s ease;
+
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+
+  }
+
+
+
+  .interest-card:hover {
+
+    background: #e0bbff;
+
+    transform: scale(1.08);
+
+  }
+
+
+
+  .interest-card div:first-child {
+
+    font-size: 26px;
+
+    margin-bottom: 6px;
+
+  }
+
+
+
+  .destination-list-section {
+
+    padding: 20px;
+
+    background: rgba(255, 255, 255, 0.2);
+
+    margin: 0 20px 20px;
+
+    border-radius: 14px;
+
+    backdrop-filter: blur(6px);
+
+    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+
+  }
+
+
+
+  .destination-list-section h3 {
+
+    margin-bottom: 12px;
+
+    color: #fff;
+
+    font-size: 22px;
+
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+
+  }
+
+
+
+  .destination-list {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 12px;
+
+    justify-content: center;
+
+  }
+
+
+
+  .destination-card {
+
+    padding: 10px 14px;
+
+    background: #cdb4db;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    transition: 0.3s ease;
+
+    font-weight: 500;
+
+    color: #2d006b;
+
+  }
+
+
+
+  .destination-card:hover {
+
+    background: #b185db;
+
+    transform: scale(1.05);
+
+  }
+
+
+
+  .filters {
+
+    padding: 14px;
+
+    background: rgba(255, 255, 255, 0.2);
+
+    text-align: center;
+
+    margin-top: 20px;
+
+    backdrop-filter: blur(5px);
+
+    color: #fff;
+
+    font-weight: 500;
+
+  }
+
+
+
+  .container {
+
+  display: flex;
+
+  flex-direction: row;
+
+  height: calc(100vh - 100px); /* 💥 Made taller, remove cramped layout */
+
+  gap: 10px;
+
+  margin: 20px;
+
+}
+
+
+
+#map {
+
+  flex: 3; /* 💥 Make map bigger than sidebar */
+
+  height: 100%;
+
+  border-radius: 12px;
+
+  min-height: 600px; /* 💥 Force height in case container is weird */
+
+  overflow: hidden;
+
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+
+}
+
+
+
+.sidebar {
+
+  flex: 1;
+
+  max-width: 350px;
+
+  height: 100%;
+
+  padding: 14px;
+
+  overflow-y: auto;
+
+  border-left: 1px solid #ccc;
+
+  background: rgba(255, 255, 255, 0.2);
+
+  border-radius: 12px;
+
+  backdrop-filter: blur(8px);
+
+  box-shadow: -4px 0 12px rgba(0,0,0,0.05);
+
+}
+
+
+
+  .sidebar h3 {
+
+    margin-top: 0;
+
+    color: #ffe0f7;
+
+  }
+
+
+
+  .place-item {
+
+    margin-bottom: 12px;
+
+    padding: 10px;
+
+    background-color: rgba(255,255,255,0.7);
+
+    border: 1px solid #ddd;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    transition: 0.2s ease;
+
+    color: #2b0057;
+
+  }
+
+
+
+  .place-item:hover {
+
+    background-color: #f3d1ff;
+
+  }
+
+
+
+  .place-item img {
+
+    width: 44px;
+
+    height: 44px;
+
+    margin-right: 12px;
+
+    border-radius: 8px;
+
+    object-fit: cover;
+
+  }
+
+
+
+  @media screen and (max-width: 768px) {
+
+    .container {
+
+      flex-direction: column;
+
+      height: auto;
+
+    }
+
+
+
+    .sidebar {
+
+      max-width: none;
+
+      height: 220px;
+
+      order: 2;
+
+    }
+
+
+
+    #map {
+
+      height: 400px;
+
+    }
+
+
+
+    .interest-card {
+
+      width: 80px;
+
+      height: 80px;
+
+    }
+
+  }
+
+</style>
+</head>
+<body>
+  <h2>Explore Places by Interest</h2>
+
+  <div class="interest-section" id="interestSection"></div>
+
+  <div class="destination-list-section">
+    <h3 id="destinationHeading">Select an interest to see popular destinations</h3>
+    <div class="destination-list" id="destinationList"></div>
+  </div>
+
+  <div class="filters">
+    <label><input type="checkbox" id="filterHotel" checked> Hotels</label>
+    <label><input type="checkbox" id="filterMall" checked> Shopping Malls</label>
+    <label><input type="checkbox" id="filterAttraction" checked> Attractions</label>
+  </div>
+
+  <div class="container">
+    <div id="map"></div>
+    <div class="sidebar">
+      <h3>Nearby Places</h3>
+      <div id="placeList">Select a destination to see nearby places...</div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+
+  <script>
+    const API_KEY = "52080020361c4f9ebc797b12037adaf1";
+
+    const interestDestinations = {
+      beach: { label: "Beaches", icon: "🌊", cities: ["Goa", "Kerala", "Andaman", "Gokarna"] },
+      hill: { label: "Hill Stations", icon: "⛰", cities: ["Shimla", "Manali", "Darjeeling", "Ooty"] },
+      history: { label: "Historical", icon: "🏰", cities: ["Delhi", "Jaipur", "Agra", "Hampi"] },
+      spiritual: { label: "Spiritual", icon: "🛕", cities: ["Varanasi", "Rishikesh", "Tirupati", "Bodh Gaya"] },
+      wildlife: { label: "Wildlife", icon: "🐅", cities: ["Jim Corbett", "Kaziranga", "Ranthambore", "Sundarbans"] },
+      desert: { label: "Deserts", icon: "🏜", cities: ["Jaisalmer", "Bikaner", "Thar Desert"] },
+      island: { label: "Islands", icon: "🏝", cities: ["Andaman & Nicobar", "Lakshadweep"] },
+      adventure: { label: "Adventure", icon: "🧗", cities: ["Rishikesh", "Auli", "Ladakh"] },
+      culture: { label: "Culture", icon: "🎨", cities: ["Kolkata", "Chennai", "Mysore"] },
+      backwater: { label: "Backwaters", icon: "🛶", cities: ["Kerala"] }
+    };
+
+    const cityCoords = {
+      "Goa": [15.2993, 74.1240], "Kerala": [10.8505, 76.2711], "Andaman": [11.7401, 92.6586],
+      "Gokarna": [14.5500, 74.3167], "Shimla": [31.1048, 77.1734], "Manali": [32.2432, 77.1892],
+      "Darjeeling": [27.0360, 88.2627], "Ooty": [11.4102, 76.6950], "Delhi": [28.6139, 77.2090],
+      "Jaipur": [26.9124, 75.7873], "Agra": [27.1767, 78.0081], "Hampi": [15.3350, 76.4600],
+      "Varanasi": [25.3176, 82.9739], "Rishikesh": [30.0869, 78.2676], "Tirupati": [13.6288, 79.4192],
+      "Bodh Gaya": [24.6950, 84.9914], "Jim Corbett": [29.5300, 78.7747], "Kaziranga": [26.5775, 93.1711],
+      "Ranthambore": [26.0173, 76.5026], "Sundarbans": [21.9497, 89.1833], "Jaisalmer": [26.9157, 70.9083],
+      "Bikaner": [28.0229, 73.3119], "Thar Desert": [27.0000, 71.0000], "Andaman & Nicobar": [11.7401, 92.6586],
+      "Lakshadweep": [10.5667, 72.6417], "Auli": [30.5286, 79.5666], "Ladakh": [34.2268, 77.5619],
+      "Kolkata": [22.5726, 88.3639], "Chennai": [13.0827, 80.2707], "Mysore": [12.2958, 76.6394]
+    };
+
+    const map = L.map('map').setView([20.5937, 78.9629], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    const destinationGroup = L.layerGroup().addTo(map);
+    const nearbyGroup = L.markerClusterGroup().addTo(map);
+    const nearbyIcon = L.icon({
+      iconUrl: 'https://cdn-icons-png.flaticon.com/512/252/252025.png',
+      iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30]
+    });
+
+    const interestSection = document.getElementById("interestSection");
+    for (let key in interestDestinations) {
+      const item = interestDestinations[key];
+      const card = document.createElement("div");
+      card.className = "interest-card";
+      card.innerHTML = `<div>${item.icon}</div><div>${item.label}</div>`;
+      card.onclick = () => handleInterestSelection(key);
+      interestSection.appendChild(card);
+    }
+
+    function handleInterestSelection(interest) {
+      const places = interestDestinations[interest].cities;
+      if (!places) return;
+
+      destinationGroup.clearLayers();
+      nearbyGroup.clearLayers();
+      document.getElementById("placeList").innerHTML = "Select a destination to see nearby places...";
+      document.getElementById("destinationList").innerHTML = "";
+      document.getElementById("destinationHeading").innerText = `Popular ${interestDestinations[interest].label} in India`;
+
+      places.forEach(city => {
+        if (cityCoords[city]) {
+          const card = document.createElement("div");
+          card.className = "destination-card";
+          card.innerText = city;
+          card.onclick = () => {
+            const [lat, lng] = cityCoords[city];
+            map.setView([lat, lng], 12);
+            loadNearbyPlaces(lat, lng);
+          };
+          document.getElementById("destinationList").appendChild(card);
+        }
+      });
+    }
+
+    function loadNearbyPlaces(lat, lng) {
+      nearbyGroup.clearLayers();
+      document.getElementById("placeList").innerHTML = "Loading nearby places...";
+
+      const filters = [];
+      if (document.getElementById("filterHotel").checked) filters.push("accommodation.hotel");
+      if (document.getElementById("filterMall").checked) filters.push("commercial.shopping_mall");
+      if (document.getElementById("filterAttraction").checked) filters.push("tourism.attraction");
+
+      if (filters.length === 0) {
+        alert("Please select at least one category.");
+        return;
+      }
+
+      const radius = 20000;
+      const url = `https://api.geoapify.com/v2/places?categories=${filters.join(",")}&filter=circle:${lng},${lat},${radius}&limit=50&apiKey=${API_KEY}`;
+
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          const listDiv = document.getElementById("placeList");
+          listDiv.innerHTML = "";
+
+          if (!data.features || data.features.length === 0) {
+            listDiv.innerHTML = "No nearby places found.";
+            return;
+          }
+
+          data.features.forEach((place) => {
+            const [lon, lat] = place.geometry.coordinates;
+            const props = place.properties;
+            const name = props.name || "Unnamed place";
+            const address = props.address_line1 || "No address";
+
+            const marker = L.marker([lat, lon], { icon: nearbyIcon });
+            marker.bindPopup(`
+              <b>${name}</b><br>${address}<br>
+              <a href="https://www.google.com/maps?q=${lat},${lon}" target="_blank">Open in Google Maps</a>
+            `);
+            nearbyGroup.addLayer(marker);
+
+            const item = document.createElement("div");
+            item.className = "place-item";
+
+            const img = document.createElement("img");
+            img.src = props.datasource?.raw?.photo || nearbyIcon.options.iconUrl;
+            img.alt = "Thumbnail";
+            item.appendChild(img);
+
+            const info = document.createElement("div");
+            info.innerHTML = `
+              <strong>${name}</strong><br>
+              ${address}<br>
+              <a href="https://www.google.com/maps?q=${lat},${lon}" target="_blank">Google Maps</a>
+            `;
+            item.appendChild(info);
+
+            item.onclick = () => {
+              map.setView([lat, lon], 15);
+              marker.openPopup();
+            };
+
+            listDiv.appendChild(item);
+          });
+        })
+        .catch(error => {
+          console.error(error);
+          document.getElementById("placeList").innerHTML = "Error loading places.";
+        });
+    }
+  </script>
+</body>
+</html>

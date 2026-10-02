@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stylish Review Page</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Share Your Thoughts</h1>
+
+    <form id="reviewForm">
+  <input type="text" id="name" placeholder="Your Name" required />
+  <input type="email" id="email" name="email" placeholder="Enter your email" class="email-input" required>
+  <textarea id="review" placeholder="Write your review..." required></textarea>
+      <div class="star-rating">
+        <input type="radio" id="star5" name="rating" value="5" required />
+        <label for="star5">&#9733;</label>
+        <input type="radio" id="star4" name="rating" value="4" />
+        <label for="star4">&#9733;</label>
+        <input type="radio" id="star3" name="rating" value="3" />
+        <label for="star3">&#9733;</label>
+        <input type="radio" id="star2" name="rating" value="2" />
+        <label for="star2">&#9733;</label>
+        <input type="radio" id="star1" name="rating" value="1" />
+        <label for="star1">&#9733;</label>
+      </div>
+
+      <button type="submit">Submit Review</button>
+    </form>
+    <div id="response"></div>
+
+    <div class="reviews" id="reviewsSection">
+      <p class="no-reviews">Be the first to leave a review!</p>
+    </div>
+  </div>
+
+  <footer class="top-nav">
+    <a href="home.html" class="back-btn">Home</a>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

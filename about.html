@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>About Us - TripTrekker</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f8fa;
+      margin: 0;
+      padding: 0;
+      color: #333;
+      animation: fadeIn 1.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero {
+      width: 100%;
+      height: 300px;
+      background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e') no-repeat center center/cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+    }
+
+    .hero h1 {
+      font-size: 3em;
+      margin: 0;
+    }
+
+    .about-container {
+      max-width: 1000px;
+      margin: auto;
+      padding: 40px 20px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      margin-top: -50px;
+      z-index: 2;
+      position: relative;
+    }
+
+    h2 {
+      color: #0077b6;
+      margin-top: 30px;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    .highlight {
+      color: #0096c7;
+      font-weight: bold;
+    }
+
+    footer {
+      text-align: center;
+      margin: 40px 0;
+      padding: 20px 0;
+      background-color: #f4f4f4;
+    }
+
+    .back-btn {
+      text-decoration: none;
+      color: #0077b6;
+      font-weight: bold;
+      padding: 10px 20px;
+      border: 2px solid #0077b6;
+      border-radius: 5px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .back-btn:hover {
+      background-color: #0077b6;
+      color: #fff;
+    }
+
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2em;
+        padding: 0 10px;
+        text-align: center;
+      }
+
+      .about-container {
+        margin-top: -30px;
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hero">
+    <h1>Discover the World with TripTrekker</h1>
+  </div>
+
+  <div class="about-container">
+    <p>Welcome to <span class="highlight">TripTrekker</span> – your all-in-one platform for planning the perfect trip!</p>
+    <p>We’re passionate about helping travelers explore the world with ease and confidence. Whether you're dreaming of a relaxing beach holiday or a thrilling adventure, we’ve got everything you need in one place.</p>
+    
+    <h2>What We Offer:</h2>
+    <ul>
+      <li><strong>Holiday Packages:</strong> Discover curated vacation packages or create your own with custom destinations and activities.</li>
+      <li><strong>Hotel Booking:</strong> Choose from a wide range of hotels to fit your style and budget.</li>
+      <li><strong>Flight Booking:</strong> Search and book flights easily at the best prices.</li>
+      <li><strong>Train Tickets:</strong> Reserve train tickets across India and beyond with a simple booking process.</li>
+      <li><strong>Travel Reviews:</strong> Read honest reviews and ratings from fellow travelers to make smarter decisions.</li>
+    </ul>
+
+    <p>At <span class="highlight">TripTrekker</span>, our mission is to make your travel planning smooth, enjoyable, and memorable. With 24/7 support and secure payment options, you can focus on the fun – we’ll handle the rest.</p>
+
+    <p style="text-align:center; margin-top: 40px;"><em>Start your journey with TripTrekker – because every great adventure begins with a wise choice.</em></p>
+  </div>
+
+  <footer>
+    <a href="home.html" class="back-btn">← Back to Home</a>
+  </footer>
+
+</body>
+</html>

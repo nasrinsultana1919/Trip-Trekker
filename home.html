@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Explore beautiful Indian travel destinations like Kashmir, Kolkata, Jaipur, and Andaman through TripTrekker.">
+  <meta name="keywords" content="travel, tourism, India, Kashmir, Kolkata, Jaipur, Andaman, TripTrekker">
+
+  <!-- Fonts and Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="home.css">
+  <title>Landing Page - TripTrekker</title>
+
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    @media (max-width: 768px) {
+      header {
+        padding: 10px 30px;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      header .navigation {
+        margin-top: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .home .content {
+        width: 100%;
+        margin-top: 20px;
+      }
+
+      .home .content h1 {
+        font-size: 2em;
+      }
+
+      .home .media-icons {
+        right: 10px;
+      }
+
+      section {
+        padding: 60px 20px;
+      }
+
+      .slider-navigation {
+        transform: translateY(50px);
+      }
+    }
+   .chatbot-logo-link {
+  display: inline-block;
+  background: #e0f7fa;
+  padding: 6px;
+  border-radius: 50%;
+  transition: transform 0.3s ease, box-shadow 0.4s ease;
+  box-shadow: 0 0 8px rgba(0, 188, 212, 0.4);
+}
+
+.chatbot-logo-link:hover {
+  transform: scale(1.25);
+  background: #b2ebf2;
+  box-shadow:
+    0 0 10px #00BCD4,
+    0 0 20px #00ACC1,
+    0 0 30px #00838F;
+}
+
+.chatbot-logo-img {
+  height: 35px;
+  width: 35px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+  </style>
+</head>
+<body>
+  <header>
+    <!-- Replace logo.png with your image or keep text brand -->
+    <a href="#" class="brand"><img src="logo.png" alt="TripTrekker" style="height: 40px;"></a>
+    <!-- If no image, use this instead: -->
+    <!-- <a href="#" class="brand">TripTrekker</a> -->
+    <div class="navigation">
+      <a href="#">Home</a>
+      <a href="about.html">About</a>
+      <a href="explore.html">Explore</a>
+      <a href="index.html">Services</a>
+      <a href="review.html">Review</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </header>
+
+  <section class="home">
+    <video src="kashmir1.mp4" muted autoplay loop class="video-slider active" playsinline preload="auto"></video>
+    <video src="kolkata.mp4" muted autoplay loop class="video-slider" playsinline preload="auto"></video>
+    <video src="jaipur1.mp4" muted autoplay loop class="video-slider" playsinline preload="auto"></video>
+    <video src="andaman1.mp4" muted autoplay loop class="video-slider" playsinline preload="auto"></video>
+
+    <div class="content active">
+      <h1>Kashmir <br><span>Heaven On Earth</span></h1>
+      <p>Nestled in the lap of the Himalayas, Kashmir offers breathtaking landscapes, pristine lakes, 
+        and snow-capped peaks. From the charm of Srinagar's houseboats to the serenity of Gulmarg’s 
+        meadows, it's a dream destination for every traveler. 
+        Discover nature’s finest masterpiece—where every view feels like a postcard.</p>
+      <a href="places.html">Read More</a>
+    </div>
+
+    <div class="content">
+      <h1>Kolkata <br><span>The Cultural Heartbeat</span></h1>
+      <p>A city that lives in its art, heritage, and poetic soul. 
+        Walk through colonial streets, ride vintage trams, and taste flavors that linger forever. 
+        Kolkata is where history meets hustle in the most vibrant way.</p>
+      <a href="places.html">Read More</a>
+    </div>
+
+    <div class="content">
+      <h1>Jaipur <br><span>The Pink City Wonder</span></h1>
+      <p>Step into royal elegance wrapped in sandstone walls and ancient forts. 
+        Jaipur enchants with its majestic palaces, bustling bazaars, and timeless traditions. 
+        It’s a colorful journey through India’s regal past.</p>
+      <a href="places.html">Read More</a>
+    </div>
+
+    <div class="content">
+      <h1>Andaman & Nicobar <br><span>Tropical Bliss</span></h1>
+      <p>Where turquoise waters kiss white sands and coral reefs dance below the surface. 
+        The islands promise serenity, adventure, and untouched beauty. 
+        A paradise escape for the soul—and the senses.</p>
+      <a href="places.html">Read More</a>
+    </div>
+
+    <div class="media-icons">
+      <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+      <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+      <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+      <a href="chat.html" target="_blank" aria-label="TripTrekker Bot" class="chatbot-logo-link">
+  <img src="chat-bot.jpg" alt="TripTrekker Bot" class="chatbot-logo-img">
+</a>
+  </a>
+
+    </div>
+
+    <div class="slider-navigation">
+      <div class="nav-btn"></div>
+      <div class="nav-btn"></div>
+      <div class="nav-btn"></div>
+      <div class="nav-btn"></div>
+    </div>
+  </section>
+
+  <script>
+    const btns = document.querySelectorAll('.nav-btn');
+    const slides = document.querySelectorAll('.video-slider');
+    const contents = document.querySelectorAll('.content');
+
+    var slidernav = function(index){
+      btns.forEach((btn) => btn.classList.remove('active'));
+      slides.forEach((slide) => {
+        slide.classList.remove('active');
+        slide.style.clipPath = 'circle(0% at 0 50%)';
+        slide.style.opacity = 0;
+      });
+      contents.forEach((content) => {
+        content.classList.remove('active');
+        content.style.opacity = 0;
+        content.style.transform = 'translateY(20px)';
+      });
+
+      btns[index].classList.add('active');
+
+      setTimeout(() => {
+        slides[index].classList.add('active');
+        slides[index].style.clipPath = 'circle(150% at 0 50%)';
+        slides[index].style.opacity = 1;
+      }, 50);
+
+      contents[index].classList.add('active');
+      contents[index].style.opacity = 1;
+      contents[index].style.transform = 'translateY(0)';
+    };
+
+    btns.forEach((btn, i) => {
+      btn.addEventListener('click', () => {
+        slidernav(i);
+      });
+    });
+
+    btns[0].classList.add('active');
+    slides[0].classList.add('active');
+    contents[0].classList.add('active');
+
+    // Auto Slide
+    let currentIndex = 0;
+    setInterval(() => {
+      currentIndex = (currentIndex + 1) % btns.length;
+      slidernav(currentIndex);
+    }, 7000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Travel Chatbot</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(120deg, #d1f4f9, #e0f7fa);
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .chat-container {
+      width: 95%;
+      max-width: 500px;
+      height: 90vh;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      background: #0288d1;
+      color: white;
+      padding: 18px;
+      text-align: center;
+      font-size: 1.4em;
+      font-weight: bold;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 16px;
+      background: #f1f5f9;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .message {
+      margin: 10px 0;
+      padding: 14px 18px;
+      max-width: 80%;
+      border-radius: 16px;
+      position: relative;
+      animation: fadeIn 0.4s ease;
+      line-height: 1.5;
+      white-space: pre-line;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .bot {
+      background: #e1f5fe;
+      color: #01579b;
+      align-self: flex-start;
+      border-top-left-radius: 0;
+    }
+
+    .user {
+      background: #0288d1;
+      color: white;
+      align-self: flex-end;
+      border-top-right-radius: 0;
+    }
+
+    .city-image {
+      width: 100%;
+      margin-top: 10px;
+      border-radius: 12px;
+      max-height: 180px;
+      object-fit: cover;
+    }
+
+    .chat-input {
+      display: flex;
+      padding: 12px;
+      border-top: 1px solid #ddd;
+      background: #ffffff;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid #ccc;
+      border-radius: 24px;
+      font-size: 1em;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    input[type="text"]:focus {
+      border-color: #0288d1;
+    }
+
+    button {
+      margin-left: 10px;
+      padding: 12px 20px;
+      background: #0288d1;
+      color: white;
+      border: none;
+      border-radius: 24px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #0277bd;
+    }
+  </style>
+</head>
+<body>
+
+<div class="chat-container">
+  <div class="chat-header">Travel Planner Bot</div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="message bot">
+      Hello! Ask me: <br>"Trip to Goa", "Trip to Udaipur", etc.<br><br>
+      Or add plans:<br>Add city: Name<br>Day 1: ...<br>Day 2: ...
+    </div>
+  </div>
+  <form id="chatForm" class="chat-input" autocomplete="off">
+    <input type="text" id="userInput" placeholder="Type your message..." required />
+    <button type="submit">Send</button>
+  </form>
+</div>
+
+<script>
+ const plans = {
+  goa: [
+    "Day 1: Relax at Baga Beach and visit the Saturday Night Market.",
+    "Day 2: Explore Old Goa churches and Basilica of Bom Jesus.",
+    "Day 3: Water sports at Calangute Beach and visit Fort Aguada.",
+    "Day 4: Day trip to Dudhsagar Waterfalls and spice plantation tour.",
+    "Day 5: Visit Panaji city and enjoy the Mandovi River cruise."
+  ],
+  jaipur: [
+    "Day 1: Visit Amber Fort and Jal Mahal.",
+    "Day 2: Explore City Palace and Hawa Mahal.",
+    "Day 3: Discover Jantar Mantar and local bazaars.",
+    "Day 4: Trip to Nahargarh Fort and Chokhi Dhani.",
+    "Day 5: Shop for traditional Rajasthani items."
+  ],
+  shimla: [
+    "Day 1: Mall Road and Ridge Walk.",
+    "Day 2: Jakhoo Temple and Kufri adventure park.",
+    "Day 3: Visit Christ Church and Scandal Point.",
+    "Day 4: Naldehra Golf Course and picnic.",
+    "Day 5: Local shopping and cafe hopping."
+  ],
+  manali: [
+    "Day 1: Snow adventure at Solang Valley.",
+    "Day 2: Rohtang Pass trip (if open).",
+    "Day 3: Visit Hadimba Temple and Manu Temple.",
+    "Day 4: Vashisht hot springs and river walk.",
+    "Day 5: Mall Road shopping and cafes."
+  ],
+  kochi: [
+    "Day 1: Fort Kochi heritage tour.",
+    "Day 2: Visit Mattancherry Palace and Jew Town.",
+    "Day 3: Houseboat or backwaters cruise.",
+    "Day 4: Cherai Beach relaxation.",
+    "Day 5: Watch Kathakali and try local cuisine."
+  ],
+  delhi: [
+    "Day 1: Visit Red Fort and Jama Masjid.",
+    "Day 2: India Gate, Rashtrapati Bhavan, and Lodhi Garden.",
+    "Day 3: Explore Qutub Minar and Lotus Temple.",
+    "Day 4: Shop at Sarojini Nagar and Connaught Place.",
+    "Day 5: Visit Akshardham Temple and take a riverfront walk."
+  ],
+  mumbai: [
+    "Day 1: Gateway of India and Colaba Causeway.",
+    "Day 2: Marine Drive and Hanging Gardens.",
+    "Day 3: Elephanta Caves tour.",
+    "Day 4: Visit Siddhivinayak Temple and Haji Ali Dargah.",
+    "Day 5: Juhu Beach and Bollywood studio tour."
+  ],
+  udaipur: [
+    "Day 1: City Palace and Lake Pichola boat ride.",
+    "Day 2: Jag Mandir and Jagdish Temple.",
+    "Day 3: Visit Sajjangarh Monsoon Palace.",
+    "Day 4: Explore Saheliyon Ki Bari and Fateh Sagar Lake.",
+    "Day 5: Local crafts shopping and cultural show."
+  ],
+  rishikesh: [
+    "Day 1: Laxman Jhula and local cafes.",
+    "Day 2: White-water rafting and Ganga beach.",
+    "Day 3: Visit Beatles Ashram and yoga retreat.",
+    "Day 4: Neelkanth Mahadev Temple trek.",
+    "Day 5: Attend evening Ganga Aarti at Triveni Ghat."
+  ],
+  darjeeling: [
+    "Day 1: Sunrise at Tiger Hill.",
+    "Day 2: Visit Batasia Loop and Ghoom Monastery.",
+    "Day 3: Himalayan Mountaineering Institute and Zoo.",
+    "Day 4: Ride the Darjeeling Toy Train.",
+    "Day 5: Local tea tasting and shopping."
+  ],
+paris: [
+  "Day 1: Eiffel Tower, Seine River cruise.",
+  "Day 2: Louvre Museum and Notre-Dame Cathedral.",
+  "Day 3: Montmartre and Sacré-Cœur.",
+  "Day 4: Versailles Palace day trip.",
+  "Day 5: Champs-Élysées and Arc de Triomphe shopping."
+],
+newyork: [
+  "Day 1: Statue of Liberty and Battery Park.",
+  "Day 2: Times Square and Broadway show.",
+  "Day 3: Central Park and Metropolitan Museum.",
+  "Day 4: Brooklyn Bridge and DUMBO area.",
+  "Day 5: Top of the Rock and 5th Avenue shopping."
+],
+tokyo: [
+  "Day 1: Senso-ji Temple and Asakusa market.",
+  "Day 2: Tokyo Skytree and Ueno Park.",
+  "Day 3: Shibuya Crossing and Harajuku.",
+  "Day 4: Akihabara tech shopping.",
+  "Day 5: Day trip to Mt. Fuji or Disneyland."
+],
+dubai: [
+  "Day 1: Burj Khalifa and Dubai Mall.",
+  "Day 2: Desert Safari and cultural dinner.",
+  "Day 3: Dubai Marina and JBR beach.",
+  "Day 4: Global Village and Miracle Garden.",
+  "Day 5: Gold Souk and traditional abra ride."
+],
+singapore: [
+  "Day 1: Marina Bay Sands and Gardens by the Bay.",
+  "Day 2: Sentosa Island fun day.",
+  "Day 3: Universal Studios Singapore.",
+  "Day 4: Chinatown and Little India exploration.",
+  "Day 5: Singapore Zoo and River Safari."
+],
+london: [
+  "Day 1: London Eye and Big Ben.",
+  "Day 2: British Museum and Covent Garden.",
+  "Day 3: Tower of London and Tower Bridge.",
+  "Day 4: Buckingham Palace and Hyde Park.",
+  "Day 5: Day trip to Windsor or Oxford."
+],
+bangkok: [
+  "Day 1: Grand Palace and Wat Pho.",
+  "Day 2: Floating Market and boat tour.",
+  "Day 3: Chatuchak Market and local street food.",
+  "Day 4: Visit Wat Arun and Chinatown.",
+  "Day 5: Day trip to Ayutthaya."
+],
+rome: [
+  "Day 1: Colosseum and Roman Forum.",
+  "Day 2: Vatican City and St. Peter’s Basilica.",
+  "Day 3: Pantheon and Trevi Fountain.",
+  "Day 4: Piazza Navona and Trastevere.",
+  "Day 5: Villa Borghese and Spanish Steps."
+],
+sydney: [
+  "Day 1: Sydney Opera House and Circular Quay.",
+  "Day 2: Bondi Beach and coastal walk.",
+  "Day 3: Taronga Zoo and Darling Harbour.",
+  "Day 4: Blue Mountains day trip.",
+  "Day 5: Harbour Bridge climb and The Rocks."
+],
+barcelona: [
+  "Day 1: Sagrada Família and Gothic Quarter.",
+  "Day 2: Park Güell and Casa Batlló.",
+  "Day 3: La Rambla and Barceloneta Beach.",
+  "Day 4: Montjuïc Castle and Magic Fountain.",
+  "Day 5: Camp Nou stadium and shopping."
+],
+istanbul: [
+  "Day 1: Hagia Sophia and Blue Mosque.",
+  "Day 2: Topkapi Palace and Basilica Cistern.",
+  "Day 3: Grand Bazaar and Spice Market.",
+  "Day 4: Bosphorus Cruise and Ortaköy.",
+  "Day 5: Galata Tower and Istiklal Street."
+],
+capetown: [
+  "Day 1: Table Mountain and V&A Waterfront.",
+  "Day 2: Robben Island and Bo-Kaap.",
+  "Day 3: Cape Point and Penguins at Boulders Beach.",
+  "Day 4: Stellenbosch wine tour.",
+  "Day 5: Kirstenbosch Gardens and Camps Bay."
+],
+toronto: [
+  "Day 1: CN Tower and Ripley’s Aquarium.",
+  "Day 2: Distillery District and St. Lawrence Market.",
+  "Day 3: Toronto Islands and Harbourfront.",
+  "Day 4: Royal Ontario Museum and Chinatown.",
+  "Day 5: Niagara Falls day trip."
+],
+kualalumpur: [
+  "Day 1: Petronas Towers and KLCC Park.",
+  "Day 2: Batu Caves and Little India.",
+  "Day 3: Bukit Bintang shopping and Jalan Alor food.",
+  "Day 4: Islamic Arts Museum and Merdeka Square.",
+  "Day 5: Sunway Lagoon or Genting Highlands trip."
+],
+bali: [
+  "Day 1: Ubud Monkey Forest and rice terraces.",
+  "Day 2: Tanah Lot Temple and Seminyak Beach.",
+  "Day 3: Mount Batur sunrise hike.",
+  "Day 4: Nusa Penida island tour.",
+  "Day 5: Balinese spa day and temple visits."
+],
+amsterdam: [
+  "Day 1: Canal cruise and Anne Frank House.",
+  "Day 2: Van Gogh Museum and Rijksmuseum.",
+  "Day 3: Vondelpark and Heineken Experience.",
+  "Day 4: Day trip to Zaanse Schans windmills.",
+  "Day 5: Jordaan neighborhood and local cafes."
+],
+vienna: [
+  "Day 1: Schönbrunn Palace and gardens.",
+  "Day 2: Hofburg Palace and Spanish Riding School.",
+  "Day 3: St. Stephen’s Cathedral and Vienna Opera House.",
+  "Day 4: Belvedere Palace and Prater park.",
+  "Day 5: Day trip to Wachau Valley or Bratislava."
+],
+athens: [
+  "Day 1: Acropolis and Parthenon.",
+  "Day 2: Plaka district and Temple of Olympian Zeus.",
+  "Day 3: National Archaeological Museum.",
+  "Day 4: Mount Lycabettus and Kolonaki shopping.",
+  "Day 5: Day cruise to Hydra or Aegina islands."
+],
+seoul: [
+  "Day 1: Gyeongbokgung Palace and Bukchon Hanok Village.",
+  "Day 2: Myeongdong shopping and Namsan Tower.",
+  "Day 3: Hongdae art and nightlife.",
+  "Day 4: Lotte World or Everland theme park.",
+  "Day 5: DMZ half-day tour and traditional street food."
+],
+prague: [
+  "Day 1: Old Town Square and Astronomical Clock.",
+  "Day 2: Charles Bridge and Prague Castle.",
+  "Day 3: Jewish Quarter and Lennon Wall.",
+  "Day 4: Petrin Hill and Letna Park.",
+  "Day 5: Vltava River cruise and shopping."
+],
+lisbon: [
+  "Day 1: Belém Tower and Jerónimos Monastery.",
+  "Day 2: Alfama and São Jorge Castle.",
+  "Day 3: LX Factory and Time Out Market.",
+  "Day 4: Day trip to Sintra and Pena Palace.",
+  "Day 5: Tram 28 ride and oceanfront walk."
+],
+zurich: [
+  "Day 1: Old Town walking tour and Lake Zurich.",
+  "Day 2: Bahnhofstrasse shopping and Lindenhof hill.",
+  "Day 3: Swiss National Museum and chocolate tasting.",
+  "Day 4: Day trip to Lucerne.",
+  "Day 5: Uetliberg hike and Zurich Zoo."
+],
+hanoi: [
+  "Day 1: Old Quarter and Hoan Kiem Lake.",
+  "Day 2: Ho Chi Minh Mausoleum and Temple of Literature.",
+  "Day 3: Water Puppet show and street food tour.",
+  "Day 4: Day trip to Ninh Binh or Perfume Pagoda.",
+  "Day 5: Night market and local cafes."
+],
+cairo: [
+  "Day 1: Pyramids of Giza and Sphinx.",
+  "Day 2: Egyptian Museum and Tahrir Square.",
+  "Day 3: Islamic Cairo and Khan El Khalili bazaar.",
+  "Day 4: Coptic Cairo and Hanging Church.",
+  "Day 5: Nile dinner cruise and shopping."
+],
+moscow: [
+  "Day 1: Red Square and Kremlin.",
+  "Day 2: Saint Basil’s Cathedral and Lenin’s Mausoleum.",
+  "Day 3: GUM shopping and Bolshoi Theatre.",
+  "Day 4: Tretyakov Gallery and Moscow Metro tour.",
+  "Day 5: Sparrow Hills and Luzhniki Stadium."
+],
+varanasi: [
+  "Day 1: Ganga Aarti at Dashashwamedh Ghat.",
+  "Day 2: Kashi Vishwanath Temple and walking tour.",
+  "Day 3: Boat ride and Sarnath day trip.",
+  "Day 4: Explore old city lanes and temples.",
+  "Day 5: Banaras Hindu University and local food."
+],
+amritsar: [
+  "Day 1: Golden Temple and langar experience.",
+  "Day 2: Jallianwala Bagh and Partition Museum.",
+  "Day 3: Wagah Border ceremony.",
+  "Day 4: Durgiana Temple and Gobindgarh Fort.",
+  "Day 5: Local shopping and food tasting."
+],
+hampi: [
+  "Day 1: Virupaksha Temple and Hampi Bazaar.",
+  "Day 2: Vittala Temple and Stone Chariot.",
+  "Day 3: Royal Enclosure and Queen’s Bath.",
+  "Day 4: Hippie Island exploration and coracle ride.",
+  "Day 5: Riverside ruins and sunset at Hemakuta Hill."
+],
+kolkata: [
+  "Day 1: Victoria Memorial and Maidan.",
+  "Day 2: Howrah Bridge and Indian Museum.",
+  "Day 3: Dakshineswar and Kalighat Temples.",
+  "Day 4: Kumartuli and College Street.",
+  "Day 5: Eco Park and Bengali cuisine."
+],
+jaisalmer: [
+  "Day 1: Jaisalmer Fort and Patwon Ki Haveli.",
+  "Day 2: Sam Sand Dunes camel safari.",
+  "Day 3: Kuldhara village and Thar Heritage Museum.",
+  "Day 4: Gadisar Lake and local shopping.",
+  "Day 5: Jain temples and desert photography."
+],
+mysore: [
+  "Day 1: Mysore Palace and Devaraja Market.",
+  "Day 2: Chamundi Hills and Nandi Statue.",
+  "Day 3: Brindavan Gardens and KRS Dam.",
+  "Day 4: St. Philomena’s Church and zoo.",
+  "Day 5: Silk and sandalwood shopping."
+],
+shillong: [
+  "Day 1: Umiam Lake and Police Bazaar.",
+  "Day 2: Shillong Peak and Elephant Falls.",
+  "Day 3: Mawphlang Sacred Forest and Don Bosco Museum.",
+  "Day 4: Day trip to Cherrapunji.",
+  "Day 5: Ward’s Lake and cathedral visit."
+],
+kodaikanal: [
+  "Day 1: Kodaikanal Lake and Coaker’s Walk.",
+  "Day 2: Pillar Rocks and Guna Caves.",
+  "Day 3: Bryant Park and Pine Forest.",
+  "Day 4: Silver Cascade and Berijam Lake.",
+  "Day 5: Local handmade chocolates and crafts."
+],
+bhubaneswar: [
+  "Day 1: Lingaraj Temple and Mukteswar Temple.",
+  "Day 2: Udayagiri & Khandagiri Caves.",
+  "Day 3: Dhauli Peace Pagoda and State Museum.",
+  "Day 4: Day trip to Konark Sun Temple.",
+  "Day 5: Chilika Lake boat ride (from Satapada)."
+],
+pondicherry: [
+  "Day 1: Promenade Beach and French Quarter.",
+  "Day 2: Auroville and Matrimandir visit.",
+  "Day 3: Paradise Beach and boating.",
+  "Day 4: Serenity Beach and handicrafts shopping.",
+  "Day 5: Botanical Garden and local cafes."
+],
+};
+
+  const cityImages = {
+    goa: "https://upload.wikimedia.org/wikipedia/commons/4/4c/Palolem_Beach_Goa.jpg",
+    jaipur: "https://upload.wikimedia.org/wikipedia/commons/d/d8/Amber_Fort_Jaipur.jpg",
+    shimla: "https://upload.wikimedia.org/wikipedia/commons/5/5b/Mall_Road_Shimla.jpg",
+    manali: "https://upload.wikimedia.org/wikipedia/commons/f/f3/Manali_Solang_Valley.jpg",
+    kochi: "https://upload.wikimedia.org/wikipedia/commons/f/fd/Kochi_fort.jpg",
+    delhi: "https://upload.wikimedia.org/wikipedia/commons/6/65/India_Gate_in_New_Delhi_03-2016_img3.jpg",
+    mumbai: "https://upload.wikimedia.org/wikipedia/commons/e/e4/Gateway_of_India_Mumbai.jpg",
+    udaipur: "https://upload.wikimedia.org/wikipedia/commons/4/4e/Udaipur_Lake_Pichola.jpg",
+    rishikesh: "https://upload.wikimedia.org/wikipedia/commons/d/d6/Ram_Jhula%2C_Rishikesh.jpg",
+    darjeeling: "https://upload.wikimedia.org/wikipedia/commons/e/e7/Darjeeling_town_view.jpg"
+  };
+
+  const chatMessages = document.getElementById('chatMessages');
+  const chatForm = document.getElementById('chatForm');
+  const userInput = document.getElementById('userInput');
+
+  function addMessage(text, sender, city = null) {
+    const msg = document.createElement('div');
+    msg.classList.add('message', sender);
+    msg.textContent = text;
+
+    if (sender === 'bot' && city && cityImages[city]) {
+      const img = document.createElement('img');
+      img.src = cityImages[city];
+      img.alt = city + " image";
+      img.className = "city-image";
+      msg.appendChild(img);
+    }
+
+    chatMessages.appendChild(msg);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function getTravelPlan(cityName) {
+    const city = cityName.toLowerCase();
+    return plans[city]
+      ? { plan: plans[city].join("\n"), city }
+      : { plan: "Sorry, I don't have a plan for that city yet.", city: null };
+  }
+
+  function parseMultipleCityPlans(text) {
+    const entries = text.split(/add city:/i).slice(1);
+    const parsed = [];
+
+    for (let entry of entries) {
+      const lines = entry.trim().split('\n').map(l => l.trim());
+      const cityName = lines[0].toLowerCase();
+      const itinerary = [];
+
+      for (let i = 1; i <= 5; i++) {
+        const dayLine = lines[i];
+        if (!dayLine || !dayLine.toLowerCase().startsWith(`day ${i}:`)) return null;
+        itinerary.push(dayLine);
+      }
+
+      parsed.push({ city: cityName, itinerary });
+    }
+
+    return parsed;
+  }
+
+  chatForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const text = userInput.value.trim();
+    if (!text) return;
+
+    addMessage(text, 'user');
+
+    if (text.toLowerCase().includes('add city:')) {
+      const cities = parseMultipleCityPlans(text);
+      if (cities) {
+        cities.forEach(({ city, itinerary }) => {
+          plans[city] = itinerary;
+          addMessage(`Added plan for: ${city.charAt(0).toUpperCase() + city.slice(1)}`, 'bot');
+        });
+      } else {
+        addMessage("Invalid format. Use:\nAdd city: CityName\nDay 1: ...\nDay 2: ...", 'bot');
+      }
+    } else if (text.toLowerCase().startsWith('trip to ')) {
+      const city = text.substring(8).trim();
+      const { plan, city: foundCity } = getTravelPlan(city);
+      addMessage(plan, 'bot', foundCity);
+    } else {
+      addMessage("Use 'Trip to CITY' or 'Add city:' format.", 'bot');
+    }
+
+    userInput.value = '';
+    userInput.focus();
+  });
+</script>
+</body>
+</html>

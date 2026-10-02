@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Travel Map with Geoapify</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    #map {
+      height: 600px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <h2 style="text-align: center;">Explore Places Around New Delhi</h2>
+
+  <div style="text-align:center; margin-bottom:10px;">
+    <input type="text" id="searchBox" placeholder="Search for places (e.g. hotel, restaurant, mall)..." style="width: 300px; padding: 8px;" />
+    <button id="searchBtn">Search</button>
+  </div>
+  <div id="map"></div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <script>
+    const API_KEY = "52080020361c4f9ebc797b12037adaf1";
+
+    const map = L.map('map').setView([28.6139, 77.2090], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    const markersGroup = L.layerGroup().addTo(map);
+
+    const categoryMap = {
+      hotel: "accommodation.hotel",
+      restaurant: "catering.restaurant",
+      attraction: "tourism.attraction",
+      mall: "commercial.shopping_mall",
+      train: "transport.train_station",
+      cafe: "catering.cafe",
+      fastfood: "catering.fast_food"
+    };
+
+    const icons = {
+      hotel: new L.Icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/139/139899.png', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -28] }),
+      restaurant: new L.Icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/3523/3523063.png', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -28] }),
+      mall: new L.Icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/3523/3523885.png', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -28] }),
+      train: new L.Icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/6333/6333704.png', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -28] }),
+      cafe: new L.Icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/3075/3075977.png', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -28] }),
+      fastfood: new L.Icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/1046/1046784.png', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -28] }),
+      default: new L.Icon.Default()
+    };
+
+    function getCategoryLabel(place) {
+      const raw = place.properties.datasource?.raw || {};
+      return raw.amenity || raw.tourism || raw.shop || "default";
+    }
+
+    function getIcon(label) {
+      return icons[label] || icons["default"];
+    }
+
+    function loadDefaultPlaces() {
+      const categories = Object.values(categoryMap);
+      const url =` https://api.geoapify.com/v2/places?categories=${categories.join(",")}&filter=circle:77.2090,28.6139,5000&limit=30&apiKey=${API_KEY}`;
+
+      fetch(url)
+        .then(res => res.json())
+        .then(result => {
+          if (result.features?.length) {
+            result.features.forEach(place => {
+              const coords = [place.geometry.coordinates[1], place.geometry.coordinates[0]];
+              const name = place.properties.name || "Unnamed";
+              const address = place.properties.address_line1 || "Address not available";
+              const label = getCategoryLabel(place);
+              const icon = getIcon(label);
+
+              L.marker(coords, { icon }).addTo(markersGroup)
+                .bindPopup(`<b>${name}</b><br>${address}<br><i>Type: ${label}</i>`);
+            });
+          } else {
+            console.warn("No default places found.");
+          }
+        })
+        .catch(err => console.error('Error loading default places:', err));
+    }
+
+    function searchPlaces(query) {
+      const category = categoryMap[query.toLowerCase()];
+      if (!category) {
+        alert(`Unknown category "${query}". Try: hotel, restaurant, mall, cafe, etc.`);
+        return;
+      }
+
+      markersGroup.clearLayers();
+      const center = map.getCenter();
+      const url = `https://api.geoapify.com/v2/places?categories=${category}&filter=circle:${center.lng},${center.lat},5000&limit=20&apiKey=${API_KEY}`;
+
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          if (data.features?.length) {
+            data.features.forEach(place => {
+              const coords = [place.geometry.coordinates[1], place.geometry.coordinates[0]];
+              const name = place.properties.name || "Unnamed";
+              const address = place.properties.address_line1 || "Address not available";
+              const label = getCategoryLabel(place);
+              const icon = getIcon(label);
+
+              L.marker(coords, { icon }).addTo(markersGroup)
+                .bindPopup(`<b>${name}</b><br>${address}<br><i>Type: ${label}</i>`);
+            });
+
+            const first = data.features[0].geometry.coordinates;
+            map.setView([first[1], first[0]], 14);
+          } else {
+            alert(`No places found for "${query}"`);
+          }
+        })
+        .catch(err => {
+          console.error("Search error:", err);
+          alert("Error searching places.");
+        });
+    }
+
+    document.getElementById("searchBtn").addEventListener("click", () => {
+      const query = document.getElementById("searchBox").value.trim();
+      if (query) searchPlaces(query);
+    });
+
+    document.getElementById("searchBox").addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        const query = document.getElementById("searchBox").value.trim();
+        if (query) searchPlaces(query);
+      }
+    });
+
+    loadDefaultPlaces();
+  </script>
+</body>
+</html>

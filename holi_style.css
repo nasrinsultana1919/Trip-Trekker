@@ -1,0 +1,224 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body & font */
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #3a8dde, #15aabf);
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Header */
+header {
+  background: rgba(255 255 255 / 0.1);
+  backdrop-filter: blur(10px);
+  padding: 60px 0 40px;
+  text-align: center;
+  box-shadow: 0 8px 15px rgb(0 0 0 / 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  animation: slideDownFadeIn 0.8s ease forwards;
+}
+
+header h1 {
+  font-weight: 600;
+  font-size: 3rem;
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+  text-shadow: 0 3px 6px rgb(0 0 0 / 0.3);
+}
+
+header p {
+  font-weight: 300;
+  font-size: 1.2rem;
+  color: #d2ebffcc;
+  text-shadow: 0 1px 4px rgb(0 0 0 / 0.2);
+}
+
+/* Packages Grid */
+.packages {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  padding-bottom: 60px;
+  animation: fadeInUp 1s ease forwards;
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+/* Individual package card */
+.package-card {
+  background: rgba(255 255 255 / 0.12);
+  backdrop-filter: blur(15px);
+  border-radius: 18px;
+  box-shadow:
+    0 10px 20px rgb(0 0 0 / 0.15),
+    0 0 30px 3px rgb(0 123 255 / 0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    transform 0.35s cubic-bezier(.4,0,.2,1),
+    box-shadow 0.35s ease;
+  outline-offset: 4px;
+}
+
+.package-card:hover,
+.package-card:focus-visible {
+  transform: translateY(-12px) scale(1.03);
+  box-shadow:
+    0 20px 40px rgb(0 0 0 / 0.3),
+    0 0 45px 5px #3399ffaa;
+}
+
+.package-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-bottom: 3px solid #3399ff;
+  transition: transform 0.35s ease;
+}
+
+.package-card:hover img,
+.package-card:focus-visible img {
+  transform: scale(1.07);
+}
+
+.package-info {
+  padding: 20px 25px 30px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.package-info h2 {
+  font-weight: 600;
+  font-size: 1.6rem;
+  margin-bottom: 10px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.package-info p {
+  font-weight: 300;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: #d6e9ffcc;
+  margin-bottom: 15px;
+  flex-grow: 1;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.25);
+}
+
+.price {
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: #ffd43b;
+  text-shadow:
+    0 0 6px #ffd43b88,
+    0 0 10px #ffd43bbb;
+  margin-bottom: 20px;
+  user-select: none;
+}
+
+.book-btn {
+  background: linear-gradient(135deg, #3399ff, #0077ff);
+  border: none;
+  color: white;
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 14px 0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 5px 15px rgb(51 153 255 / 0.5);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.book-btn:hover,
+.book-btn:focus-visible {
+  background: linear-gradient(135deg, #1a73ff, #005ecb);
+  box-shadow: 0 8px 20px rgb(26 115 255 / 0.8);
+  outline: none;
+}
+
+/* Footer */
+footer {
+  background: rgba(255 255 255 / 0.12);
+  padding: 25px 20px;
+  text-align: center;
+  border-top: 1px solid rgba(255 255 255 / 0.2);
+}
+
+.back-btn {
+  color: #e1e9ff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 10px 25px;
+  border: 2px solid #e1e9ff;
+  border-radius: 30px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  display: inline-block;
+}
+
+.back-btn:hover,
+.back-btn:focus-visible {
+  background-color: #e1e9ff;
+  color: #0a1f44;
+  outline: none;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDownFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive tweaks */
+@media (max-width: 480px) {
+  header h1 {
+    font-size: 2rem;
+  }
+
+  header p {
+    font-size: 1rem;
+  }
+
+  .package-info h2 {
+    font-size: 1.3rem;
+  }
+
+  .price {
+    font-size: 1.1rem;
+  }
+}

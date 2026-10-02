@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Explore India Packages</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1c1f27, #2b5876);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 2rem 1rem;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: #fff;
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.04); color: #ffccff; }
+    }
+
+    input, button {
+      padding: 0.7rem 1rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      margin: 0.5rem;
+    }
+
+    input {
+      width: 200px;
+      background: #fff;
+    }
+
+    button {
+      background: #ff3366;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 8px #ff3366;
+    }
+
+    button:hover {
+      background: #ff4f80;
+      box-shadow: 0 0 20px #ff4f80, 0 0 30px #ff4f80;
+    }
+
+    main {
+      padding: 2rem 1rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+
+    .place-card {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 1rem;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(12px);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    .place-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .place-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 12px;
+    }
+
+    .place-card h3 {
+      margin: 1rem 0 0.5rem;
+      font-size: 1.3rem;
+      color: #ffccff;
+    }
+
+    .place-card p {
+      font-size: 0.95rem;
+      color: #ddd;
+    }
+
+    .icon {
+      margin-right: 0.4rem;
+      color: #ffccff;
+    }
+
+    @media (max-width: 480px) {
+      header h1 {
+        font-size: 1.7rem;
+      }
+
+      input {
+        width: 140px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1><i class="fas fa-map-marked-alt icon"></i> Where You Craving to Go?</h1>
+    <input type="text" id="cityInput" placeholder="Enter city (e.g., Goa)">
+    <button onclick="fetchPlaces()"><i class="fas fa-search icon"></i>Search</button>
+  </header>
+
+  <main id="results">
+    <!-- Dynamic content appears here -->
+  </main>
+
+  <script>
+    const geoapifyKey = '26e788ffd6bd4b55b7075ad15857246a';
+
+    async function fetchPlaces() {
+      const city = document.getElementById('cityInput').value;
+      if (!city) return alert('Enter a city, sexy.');
+
+      const geocodeUrl = `https://api.geoapify.com/v1/geocode/search?text=${city}&apiKey=${geoapifyKey}`;
+      const geoRes = await fetch(geocodeUrl);
+      const geoData = await geoRes.json();
+
+      if (!geoData.features.length) return alert('No location found. Try again.');
+      const { lat, lon } = geoData.features[0].properties;
+
+      const placeUrl = `https://api.geoapify.com/v2/places?categories=tourism.sights&filter=circle:${lon},${lat},5000&limit=10&apiKey=${geoapifyKey}`;
+      const placeRes = await fetch(placeUrl);
+      const placeData = await placeRes.json();
+
+      displayPlaces(placeData.features);
+    }
+
+    async function displayPlaces(places) {
+      const container = document.getElementById('results');
+      container.innerHTML = '';
+
+      for (let place of places) {
+        const name = place.properties.name || 'Unnamed Spot';
+        const wikipediaSearch = encodeURIComponent(name);
+        const wikiUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${wikipediaSearch}`;
+
+        let imgSrc = 'https://via.placeholder.com/300x200?text=No+Image';
+        let summary = '';
+
+        try {
+          const wikiRes = await fetch(wikiUrl);
+          const wikiData = await wikiRes.json();
+          if (wikiData.thumbnail) imgSrc = wikiData.thumbnail.source;
+          summary = wikiData.extract || '';
+        } catch (err) {
+          summary = 'No description available.';
+        }
+
+        container.innerHTML += `
+          <div class="place-card">
+            <img src="${imgSrc}" alt="${name}">
+            <h3><i class="fas fa-location-dot icon"></i>${name}</h3>
+            <p>${summary}</p>
+          </div>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>
